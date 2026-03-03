@@ -1,0 +1,111 @@
+# WaveGuideDiff (Wavelet-Guidewire Diffusion Model) Inference Config
+#
+# Model description:
+#   Wavelet-guided diffusion model for IVOCT guidewire artifact removal
+#
+# Core modules:
+#   - DWT Encoding: DWT downsampling
+#   - IDWT Expanding: IDWT upsampling
+#   - FSAM: Frequency-selective attention
+#   - BFIM: Bi-directional frequency interaction
+#   - SAFM: Spatial-aware feature merging
+#   - MSR: Multi-scale residual
+
+attention_resolutions: 32,16,8
+class_cond: false
+diffusion_steps: 1000
+learn_sigma: true
+noise_schedule: cosine  # Must match training
+num_channels: 128
+num_head_channels: 128
+num_in_channels: 3
+num_out_channels: 6
+num_heads: [3, 6, 12, 24]
+num_res_blocks: 2
+resblock_updown: true
+use_fp16: false
+use_scale_shift_norm: true
+classifier_scale: 4.0
+lr_kernel_n_std: 2
+num_samples: -1
+show_progress: true
+timestep_respacing: '250'  # Use 250 steps for faster inference
+use_kl: false
+predict_xstart: false
+rescale_timesteps: false
+rescale_learned_sigmas: false
+classifier_use_fp16: false
+classifier_width: 128
+classifier_depth: 2
+classifier_attention_resolutions: 32,16,8
+classifier_use_scale_shift_norm: true
+classifier_resblock_updown: true
+classifier_pool: attention
+num_heads_upsample: -1
+channel_mult: ''
+dropout: 0.0
+use_checkpoint: false
+use_new_attention_order: false
+clip_denoised: true
+use_ddim: false
+ddim_eta: 0.5
+image_size: 512
+seed: 36
+
+# Model path - update based on actual training results
+model_path: '/mnt/user/Checkpoints/WaveGuideDiff/log_cosine_batch4/ema_0.9999_100000.pt'
+name: WaveGuideDiff
+model_type: waveguidediff  # WaveGuideDiff model
+
+# WaveGuideDiff-specific parameters
+patch_size: 4
+embed_dim: 96
+depths: [2, 2, 2, 2]
+window_size: 8
+mlp_ratio: 4.0
+qkv_bias: true
+drop_rate: 0.0
+drop_path_rate: 0.1
+ape: false
+patch_norm: true
+use_safm: true  # Use SAFM (Spatial-Aware Feature Merging)
+use_msr: true   # Use MSR (Multi-Scale Residual)
+
+inpa_inj_sched_prev: true
+n_jobs: 1
+print_estimated_vars: true
+inpa_inj_sched_prev_cumnoise: false
+
+respace_interpolate: false
+use_value_logger: false
+
+# DDPM mode: using jump sampling
+schedule_jump_params:
+  t_T: 250
+  n_sample: 1
+  jump_length: 1
+  jump_n_sample: 5
+
+data:
+  eval:
+    paper_face_mask:
+      mask_loader: true
+      gt_path: "/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_images"
+      mask_path: "/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_masks"
+      image_size: 512
+      class_cond: false
+      deterministic: true
+      random_crop: false
+      random_flip: false
+      return_dict: true
+      drop_last: false
+      batch_size: 1
+      return_dataloader: true
+      offset: 0
+      max_len: null
+      num_workers: 0
+      paths:
+        srs: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/srs'
+        lrs: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/lrs'
+        gts: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/gts'
+        gt_keep_masks: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/gt_keep_masks'
