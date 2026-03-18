@@ -2,75 +2,65 @@
 
 Official PyTorch implementation of **WaveGuideDiff: A Wavelet-Guided Diffusion Model for Guidewire Artifact Removal in IVOCT Images**.
 
-## Overview
+WaveGuideDiff is designed to repair guidewire artifacts in intravascular optical coherence tomography (IVOCT) images while preserving vessel structures and tissue details. This repository includes training, inference, and image-quality evaluation code for the WaveGuideDiff pipeline.
 
-WaveGuideDiff is a wavelet-guided diffusion model designed for removing guidewire artifacts from Intravascular Optical Coherence Tomography (IVOCT) images. The model leverages wavelet transforms to effectively separate and process frequency components, enabling high-quality artifact removal while preserving important structural details.
+## Example Results
 
+The following examples show guidewire-corrupted Cartesian images and the corresponding repaired outputs.
 
-### Core Components
-
-1. **DWT Encoding**: Separates input into low and high frequency components
-2. **FSAM**: Frequency-selective attention for high-frequency enhancement
-3. **BFIM**: Bi-directional information exchange between frequency bands
-4. **FSDC**: Frequency-aware spatial dimension compression
-5. **MSR**: Multi-scale residual connections for global information flow
-6. **IDWT Expanding**: Reconstructs output from frequency components
+| Original | Repaired |
+| --- | --- |
+| <img src="datasets/example/cartesian_image/image1.png" width="320" alt="original image 1"> | <img src="datasets/example/cartesian_repaired/image1.png" width="320" alt="repaired image 1"> |
+| <img src="datasets/example/cartesian_image/image2.png" width="320" alt="original image 2"> | <img src="datasets/example/cartesian_repaired/image2.png" width="320" alt="repaired image 2"> |
+| <img src="datasets/example/cartesian_image/image3.png" width="320" alt="original image 3"> | <img src="datasets/example/cartesian_repaired/image3.png" width="320" alt="repaired image 3"> |
+| <img src="datasets/example/cartesian_image/image4.png" width="320" alt="original image 4"> | <img src="datasets/example/cartesian_repaired/image4.png" width="320" alt="repaired image 4"> |
 
 ## Installation
 
-### Requirements
+### Environment
 
 - Python >= 3.8
-- PyTorch >= 1.12.0
-- CUDA >= 11.3 (for GPU training)
+- PyTorch >= 1.12
+- CUDA-compatible GPU is recommended for training and inference
+
+### Dependency Note
+
+This repository currently does **not** provide a top-level `requirements.txt`. Training dependencies are declared in `training/setup.py`, while some inference and evaluation packages are installed separately.
 
 ### Setup
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/Starfish0909/WaveGuideDiff.git
 cd WaveGuideDiff
-```
 
-2. Install dependencies:
-```bash
-# Install training dependencies
-cd training
-pip install -e .
-
-# Install evaluation dependencies
-pip install pyiqa opencv-python tqdm
+# Install a PyTorch build that matches your CUDA environment first.
+# Then install the project package and extra tools.
+pip install -e ./training
+pip install pyiqa opencv-python pyyaml
 ```
 
 ## Project Structure
 
-```
+```text
 WaveGuideDiff/
 ├── training/                    # Training code
-│   ├── scripts/
-│   │   ├── image_train.py      # Main training script
-│   │   └── improved_diffusion/
-│   │       ├── waveguidediff.py    # WaveGuideDiff model (Full)
-│   │       └── ...
-│   ├── train_waveguidediff.sh  # Training script for WaveGuideDiff
-├── inference/                   # Inference code
-│   ├── test.py                 # Main inference script
+│   ├── scripts/                # Diffusion model and training utilities
+│   └── train_waveguidediff.sh  # Training entry script
+├── inference/                  # Inference code and configs
 │   ├── confs/
-│   │   ├── waveguidediff.yml   # WaveGuideDiff config
+│   ├── test.py
 │   └── inference_waveguidediff.sh
-├── evaluation/                  # Evaluation code
-│   ├── pyiqa_evaluation.py     # PyIQA-based evaluation
-│   └── run_pyiqa_example.sh
-└── shared/
-    └── model_registry.py       # Shared model registry
+├── evaluation/                 # Quality evaluation scripts
+├── datasets/example/           # Example original and repaired images
+├── model.pdf                   # Model figure
+└── result.pdf                  # Example result figure
 ```
 
-## Usage
+## Data Preparation
 
-### Training
+Prepare your training data in paired form. A typical structure is:
 
-1. Prepare your dataset in the following structure:
-```
+```text
 data/
 ├── train_images/
 │   ├── image1.png
@@ -82,45 +72,54 @@ data/
     └── ...
 ```
 
-2. Update paths in `training/train_waveguidediff.sh`:
+Update the data paths in `training/train_waveguidediff.sh` before launching training.
+
+## Training
+
+Edit the relevant paths in `training/train_waveguidediff.sh`:
+
 ```bash
 export DATA_DIR='/path/to/your/train_images'
-export OPENAI_LOGDIR="/path/to/save/checkpoints"
+export OPENAI_LOGDIR='/path/to/save/checkpoints'
 ```
 
-3. Start training:
+Run training:
+
 ```bash
 cd training
 bash train_waveguidediff.sh
 ```
 
-### Inference
+## Inference
 
-1. Update the model path and data paths in `inference/confs/waveguidediff.yml`:
+Update `inference/confs/waveguidediff.yml` with your checkpoint and dataset paths:
+
 ```yaml
 model_path: '/path/to/checkpoint.pt'
 data:
   eval:
     paper_face_mask:
-      gt_path: "/path/to/test_images"
-      mask_path: "/path/to/test_masks"
+      gt_path: '/path/to/test_images'
+      mask_path: '/path/to/test_masks'
 ```
 
-2. Run inference:
+Run inference with:
+
 ```bash
 cd inference
 python test.py --conf_path confs/waveguidediff.yml
 ```
 
-Or use the provided script:
+Or use the helper script:
+
 ```bash
 cd inference
 bash inference_waveguidediff.sh
 ```
 
-### Evaluation
+## Evaluation
 
-Evaluate results using PyIQA metrics (PSNR, SSIM, LPIPS, DISTS, FID):
+Evaluate repaired results against ground truth images:
 
 ```bash
 cd evaluation
@@ -130,26 +129,6 @@ python pyiqa_evaluation.py \
     --device cuda \
     --compute_fid
 ```
-
-
-## Supported Models
-
-The codebase supports multiple model architectures through a unified registry system:
-
-- **WaveGuideDiff**: Full model with all modules (A+B+C)
-- **SwinUNet**: Swin Transformer-based UNet baseline
-
-To add a new model, simply register it in `shared/model_registry.py`.
-
-## Evaluation Metrics
-
-The evaluation script supports the following metrics:
-
-- **PSNR** (Peak Signal-to-Noise Ratio): Higher is better
-- **SSIM** (Structural Similarity Index): Higher is better
-- **LPIPS** (Learned Perceptual Image Patch Similarity): Lower is better
-- **DISTS** (Deep Image Structure and Texture Similarity): Lower is better
-- **FID** (Fréchet Inception Distance): Lower is better
 
 ## Citation
 
@@ -166,10 +145,9 @@ If you find this work useful, please cite:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](training/LICENSE) file for details.
+This project is licensed under the MIT License. See `training/LICENSE` for details.
 
 ## Acknowledgments
 
-This codebase is built upon:
-- [OpenAI's Improved Diffusion](https://github.com/openai/improved-diffusion)
-- [PyIQA](https://github.com/chaofengc/IQA-PyTorch) for image quality assessment
+- [OpenAI Improved Diffusion](https://github.com/openai/improved-diffusion)
+- [PyIQA](https://github.com/chaofengc/IQA-PyTorch)
