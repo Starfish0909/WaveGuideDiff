@@ -6,29 +6,21 @@
 # Model description:
 #   WaveGuideDiff is a wavelet-guided diffusion model for IVOCT guidewire artifact removal
 #
-# Core modules:
-#   1. DWT Encoding: DWT downsampling, separating low and high frequency components
-#   2. IDWT Expanding: IDWT upsampling, frequency domain reconstruction
-#   3. FSAM: Frequency-selective attention module, enhancing high-frequency details
-#   4. BFIM: Bi-directional frequency interaction module
-#   5. SAFM: Spatial-aware feature merging, cross-layer skip connections
-#   6. MSR: Multi-scale residual connections, global information flow
-#
 # Usage:
 #   ./train_waveguidediff.sh
 # ============================================================================
 
-export OPENAI_LOGDIR="/mnt/user/Checkpoints/WaveGuideDiff/log_cosine_batch4"
-export DATA_DIR='/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/augmented_train_images'
+export OPENAI_LOGDIR="/mnt/user/Checkpoints/WaveGuideDiff/log"
+export DATA_DIR=''
 export OPENAI_LOG_FORMAT="stdout,log,csv,tensorboard"
 
 # ============================================================================
 # Training config: auto-compute steps based on epochs
 # ============================================================================
-NUM_IMAGES=3594        # Number of images in dataset
-TARGET_EPOCHS=112      # Target training epochs (adjust as needed)
-BATCH_SIZE=4           # Batch size (effective batch size)
-MICROBATCH=4           # Forward pass batch size (for gradient accumulation)
+NUM_IMAGES=        # Number of images in dataset
+TARGET_EPOCHS=      # Target training epochs (adjust as needed)
+BATCH_SIZE=           # Batch size (effective batch size)
+MICROBATCH=           # Forward pass batch size (for gradient accumulation)
                        # Set to 2 if GPU memory is insufficient
                        # Gradient accumulation steps = BATCH_SIZE / MICROBATCH
 
@@ -36,16 +28,14 @@ MICROBATCH=4           # Forward pass batch size (for gradient accumulation)
 STEPS_PER_EPOCH=$((NUM_IMAGES / BATCH_SIZE))
 TOTAL_STEPS=$((STEPS_PER_EPOCH * TARGET_EPOCHS))
 
-echo "=========================================="
-echo "Training WaveGuideDiff (Full) (Module A + B + C)"
-echo "=========================================="
+
 echo "Training config:"
 echo "  - Dataset size: $NUM_IMAGES images"
 echo "  - Batch Size: $BATCH_SIZE"
 echo "  - Target epochs: $TARGET_EPOCHS"
 echo "  - Steps per epoch: $STEPS_PER_EPOCH steps"
 echo "  - Total training steps: $TOTAL_STEPS steps"
-echo "=========================================="
+
 
 # WaveGuideDiff model parameter config
 # Explicitly specify all key parameters to ensure correct configuration
@@ -78,10 +68,10 @@ TRAIN_FLAGS="--lr 1e-4 \
     --seed 42"
 
 # Visualization config
-VIZ_GT_PATH="/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_images/020907(3T)_IMG0011G.png"
-VIZ_MASK_PATH="/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_masks/020907(3T)_IMG0011G.png"
-VIZ_GT_DIR="/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_images"
-VIZ_MASK_DIR="/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_masks"
+VIZ_GT_PATH=""
+VIZ_MASK_PATH=""
+VIZ_GT_DIR=""
+VIZ_MASK_DIR=""
 VIZ_DIFFUSION_STEPS="1000"
 VIZ_RESPACING="250"
 VIZ_SCHEDULE_JUMP_PARAMS="{\\\"t_T\\\": 250, \\\"n_sample\\\": 1, \\\"jump_length\\\": 1, \\\"jump_n_sample\\\": 5}"
@@ -95,33 +85,7 @@ VIZ_FLAGS="--viz_gt_path ${VIZ_GT_PATH} \
 
 export OUTPUT_DIR="/mnt/user/Checkpoints/WaveGuideDiff"
 
-echo "=========================================="
-echo "WaveGuideDiff Full model (Module A + B + C)"
-echo "=========================================="
-echo ""
-echo "Module composition:"
-echo "  - Module A: DWT/IDWT + FSAM (Frequency domain foundation)"
-echo "  - Module B: BFIM (Bi-directional frequency interaction)"
-echo "  - Module C: FSDC + MSR + SAFM (Information preservation)"
-echo ""
-echo "Core innovations:"
-echo "  1. FSAM (Frequency-Selective Attention) - Module A"
-echo "     Selective enhancement of high-frequency components"
-echo ""
-echo "  2. BFIM (Bi-directional Frequency Interaction) - Module B"
-echo "     Bi-directional information exchange between low and high frequencies"
-echo ""
-echo "  3. FSDC (Frequency-aware Compression) - Module C"
-echo "     Grouped compression, maintaining frequency component independence"
-echo ""
-echo "  4. MSR (Multi-Scale Residual) - Module C"
-echo "     Global residual connections, preserving original information"
-echo ""
-echo "  5. SAFM (Spatial-Aware Feature Merging) - Module C"
-echo "     Smart skip connection fusion"
-echo ""
-echo "Output directory: $OUTPUT_DIR"
-echo "=========================================="
+
 
 CHECKPOINT_PATH=""
 

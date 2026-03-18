@@ -3,14 +3,7 @@ import inspect
 
 from . import gaussian_diffusion as gd
 from .respace import SpacedDiffusion, space_timesteps
-from .unet import UNetModel
-from .swin_unet import SwinUNetModel
-from .DiT import DiTModel
 from .waveguidediff import WaveGuideDiff
-from .waveguidediff_A import WaveGuideDiff_ModuleA
-from .waveguidediff_AC import WaveGuideDiff_ModuleAC
-from .waveguidediff_AB_old import WaveGuideDiff_ModuleB
-from .waveguidediff_AB_new import WaveGuideDiff_AB_new
 
 NUM_CLASSES = 0
 
@@ -18,7 +11,6 @@ NUM_CLASSES = 0
 def model_and_diffusion_defaults():
     """
     Defaults for image training.
-    Supports: unet, swin_unet, dit, waveguidediff, waveguidediff_a, waveguidediff_ab, waveguidediff_ab_new, waveguidediff_ac
     """
     return dict(
         image_size=512,
@@ -147,107 +139,11 @@ def create_model(
 ):
     """
     Create a model based on model_type.
-    Supports: unet, swin_unet, dit, waveguidediff, waveguidediff_a, waveguidediff_ab, waveguidediff_ab_new, waveguidediff_ac
     """
     model_type_lower = model_type.lower()
 
-    if model_type_lower == "unet":
-        # Get channel_mult for UNet
-        if image_size == 512:
-            channel_mult = (1, 1, 2, 2, 4, 4, 8)
-        elif image_size == 256:
-            channel_mult = (1, 1, 2, 2, 4, 4)
-        elif image_size == 128:
-            channel_mult = (1, 1, 2, 3, 4)
-        elif image_size == 64:
-            channel_mult = (1, 2, 3, 4)
-        else:
-            raise ValueError(f"Unsupported image size for UNet: {image_size}")
 
-        # Parse attention_resolutions
-        attention_ds = []
-        for res in attention_resolutions.split(","):
-            attention_ds.append(image_size // int(res))
-
-        return UNetModel(
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            num_res_blocks=num_res_blocks,
-            attention_resolutions=tuple(attention_ds),
-            dropout=dropout,
-            channel_mult=channel_mult,
-            num_classes=(NUM_CLASSES if class_cond else None),
-            use_checkpoint=use_checkpoint,
-            num_heads=num_heads,
-            num_heads_upsample=num_heads_upsample,
-            use_scale_shift_norm=use_scale_shift_norm,
-        )
-
-    elif model_type_lower == "swin_unet":
-        # Extract SwinUNet-specific parameters
-        patch_size = kwargs.get('patch_size', 4)
-        embed_dim = kwargs.get('embed_dim', 96)
-        depths = kwargs.get('depths', [2, 2, 2, 2])
-        window_size = kwargs.get('window_size', 8)
-        mlp_ratio = kwargs.get('mlp_ratio', 4.0)
-        qkv_bias = kwargs.get('qkv_bias', True)
-        drop_rate = kwargs.get('drop_rate', 0.0)
-        drop_path_rate = kwargs.get('drop_path_rate', 0.1)
-        ape = kwargs.get('ape', False)
-        patch_norm = kwargs.get('patch_norm', True)
-
-        # Handle num_heads parameter
-        if isinstance(num_heads, int):
-            num_heads_list = [num_heads] * len(depths)
-        elif isinstance(num_heads, list):
-            num_heads_list = num_heads
-        else:
-            num_heads_list = [3, 6, 12, 24]
-
-        return SwinUNetModel(
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            img_size=image_size,
-            patch_size=patch_size,
-            embed_dim=embed_dim,
-            depths=depths,
-            num_heads=num_heads_list,
-            window_size=window_size,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            drop_rate=drop_rate,
-            attn_drop_rate=drop_rate,
-            drop_path_rate=drop_path_rate,
-            ape=ape,
-            patch_norm=patch_norm,
-            use_checkpoint=use_checkpoint,
-            num_classes=(NUM_CLASSES if class_cond else None),
-        )
-
-    elif model_type_lower == "dit":
-        # Extract DiT-specific parameters
-        dit_depth = kwargs.get('dit_depth', 12)
-        dit_hidden_size = kwargs.get('dit_hidden_size', 768)
-        dit_patch_size = kwargs.get('dit_patch_size', 8)
-        dit_mlp_ratio = kwargs.get('dit_mlp_ratio', 4.0)
-
-        return DiTModel(
-            input_size=image_size,
-            patch_size=dit_patch_size,
-            in_channels=num_in_channels,
-            out_channels=num_out_channels,
-            hidden_size=dit_hidden_size,
-            depth=dit_depth,
-            num_heads=num_heads if isinstance(num_heads, int) else num_heads[0],
-            mlp_ratio=dit_mlp_ratio,
-            class_dropout_prob=0.1 if class_cond else 0.0,
-            num_classes=(NUM_CLASSES if class_cond else None),
-            learn_sigma=learn_sigma,
-        )
-
-    elif model_type_lower == "waveguidediff":
+    if model_type_lower == "waveguidediff":
         # Extract WaveGuideDiff-specific parameters
         patch_size = kwargs.get('patch_size', 4)
         embed_dim = kwargs.get('embed_dim', 96)
@@ -291,175 +187,11 @@ def create_model(
             use_msr=use_msr,
         )
 
-    elif model_type_lower in ["waveguidediff_a", "wgd_a", "module_a"]:
-        # WaveGuideDiff Module A (DWT/IDWT wavelet transform only)
-        patch_size = kwargs.get('patch_size', 4)
-        embed_dim = kwargs.get('embed_dim', 96)
-        depths = kwargs.get('depths', [2, 2, 2, 2])
-        window_size = kwargs.get('window_size', 8)
-        mlp_ratio = kwargs.get('mlp_ratio', 4.0)
-        qkv_bias = kwargs.get('qkv_bias', True)
-        drop_rate = kwargs.get('drop_rate', 0.0)
-        drop_path_rate = kwargs.get('drop_path_rate', 0.1)
-        ape = kwargs.get('ape', False)
-        patch_norm = kwargs.get('patch_norm', True)
-
-        # Handle num_heads parameter
-        if isinstance(num_heads, int):
-            num_heads_list = [num_heads] * len(depths)
-        elif isinstance(num_heads, list):
-            num_heads_list = num_heads
-        else:
-            num_heads_list = [3, 6, 12, 24]
-
-        return WaveGuideDiff_ModuleA(
-            img_size=image_size,
-            patch_size=patch_size,
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            embed_dim=embed_dim,
-            depths=depths,
-            num_heads=num_heads_list,
-            window_size=window_size,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            drop_rate=drop_rate,
-            drop_path_rate=drop_path_rate,
-            ape=ape,
-            patch_norm=patch_norm,
-            use_checkpoint=use_checkpoint,
-        )
-
-    elif model_type_lower in ["waveguidediff_ab", "wgd_ab", "module_ab", "module_b"]:
-        # WaveGuideDiff Module A+B (DWT/IDWT + FSAM + BFIM + FSDC + SAFM)
-        patch_size = kwargs.get('patch_size', 4)
-        embed_dim = kwargs.get('embed_dim', 96)
-        depths = kwargs.get('depths', [2, 2, 2, 2])
-        window_size = kwargs.get('window_size', 8)
-        mlp_ratio = kwargs.get('mlp_ratio', 4.0)
-        qkv_bias = kwargs.get('qkv_bias', True)
-        drop_rate = kwargs.get('drop_rate', 0.0)
-        drop_path_rate = kwargs.get('drop_path_rate', 0.1)
-        ape = kwargs.get('ape', False)
-        patch_norm = kwargs.get('patch_norm', True)
-        use_safm = kwargs.get('use_safm', True)
-
-        # Handle num_heads parameter
-        if isinstance(num_heads, int):
-            num_heads_list = [num_heads] * len(depths)
-        elif isinstance(num_heads, list):
-            num_heads_list = num_heads
-        else:
-            num_heads_list = [3, 6, 12, 24]
-
-        return WaveGuideDiff_ModuleB(
-            img_size=image_size,
-            patch_size=patch_size,
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            embed_dim=embed_dim,
-            depths=depths,
-            num_heads=num_heads_list,
-            window_size=window_size,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            drop_rate=drop_rate,
-            drop_path_rate=drop_path_rate,
-            ape=ape,
-            patch_norm=patch_norm,
-            use_checkpoint=use_checkpoint,
-            use_safm=use_safm,
-        )
-
-    elif model_type_lower in ["waveguidediff_ab_new", "wgd_ab_new", "module_ab_new"]:
-        # WaveGuideDiff Module A+B_new (DWT/IDWT + FSAM + BFIM)
-        patch_size = kwargs.get('patch_size', 4)
-        embed_dim = kwargs.get('embed_dim', 96)
-        depths = kwargs.get('depths', [2, 2, 2, 2])
-        window_size = kwargs.get('window_size', 8)
-        mlp_ratio = kwargs.get('mlp_ratio', 4.0)
-        qkv_bias = kwargs.get('qkv_bias', True)
-        drop_rate = kwargs.get('drop_rate', 0.0)
-        drop_path_rate = kwargs.get('drop_path_rate', 0.1)
-        ape = kwargs.get('ape', False)
-        patch_norm = kwargs.get('patch_norm', True)
-
-        # Handle num_heads parameter
-        if isinstance(num_heads, int):
-            num_heads_list = [num_heads] * len(depths)
-        elif isinstance(num_heads, list):
-            num_heads_list = num_heads
-        else:
-            num_heads_list = [3, 6, 12, 24]
-
-        return WaveGuideDiff_AB_new(
-            img_size=image_size,
-            patch_size=patch_size,
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            embed_dim=embed_dim,
-            depths=depths,
-            num_heads=num_heads_list,
-            window_size=window_size,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            drop_rate=drop_rate,
-            drop_path_rate=drop_path_rate,
-            ape=ape,
-            patch_norm=patch_norm,
-            use_checkpoint=use_checkpoint,
-        )
-
-    elif model_type_lower in ["waveguidediff_ac", "wgd_ac", "module_ac"]:
-        # WaveGuideDiff Module A+C (DWT/IDWT + MSR multi-scale residual)
-        patch_size = kwargs.get('patch_size', 4)
-        embed_dim = kwargs.get('embed_dim', 96)
-        depths = kwargs.get('depths', [2, 2, 2, 2])
-        window_size = kwargs.get('window_size', 8)
-        mlp_ratio = kwargs.get('mlp_ratio', 4.0)
-        qkv_bias = kwargs.get('qkv_bias', True)
-        drop_rate = kwargs.get('drop_rate', 0.0)
-        drop_path_rate = kwargs.get('drop_path_rate', 0.1)
-        ape = kwargs.get('ape', False)
-        patch_norm = kwargs.get('patch_norm', True)
-        use_msr = kwargs.get('use_msr', True)
-
-        # Handle num_heads parameter
-        if isinstance(num_heads, int):
-            num_heads_list = [num_heads] * len(depths)
-        elif isinstance(num_heads, list):
-            num_heads_list = num_heads
-        else:
-            num_heads_list = [3, 6, 12, 24]
-
-        return WaveGuideDiff_ModuleAC(
-            img_size=image_size,
-            patch_size=patch_size,
-            in_channels=num_in_channels,
-            model_channels=num_channels,
-            out_channels=num_out_channels,
-            embed_dim=embed_dim,
-            depths=depths,
-            num_heads=num_heads_list,
-            window_size=window_size,
-            mlp_ratio=mlp_ratio,
-            qkv_bias=qkv_bias,
-            drop_rate=drop_rate,
-            drop_path_rate=drop_path_rate,
-            ape=ape,
-            patch_norm=patch_norm,
-            use_checkpoint=use_checkpoint,
-            use_msr=use_msr,
-        )
 
     else:
         raise ValueError(
             f"Unsupported model type: {model_type}. "
-            f"Supported types: unet, swin_unet, dit, waveguidediff, "
-            f"waveguidediff_a, waveguidediff_ab, waveguidediff_ab_new, waveguidediff_ac"
+            f"Supported types: waveguidediff"
         )
 
 

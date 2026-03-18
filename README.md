@@ -6,22 +6,6 @@ Official PyTorch implementation of **WaveGuideDiff: A Wavelet-Guided Diffusion M
 
 WaveGuideDiff is a wavelet-guided diffusion model designed for removing guidewire artifacts from Intravascular Optical Coherence Tomography (IVOCT) images. The model leverages wavelet transforms to effectively separate and process frequency components, enabling high-quality artifact removal while preserving important structural details.
 
-### Key Features
-
-- **Wavelet-Guided Architecture**: Utilizes Discrete Wavelet Transform (DWT) and Inverse DWT (IDWT) for frequency-aware processing
-- **Modular Design**: Incremental ablation study with three core modules (A, B, C)
-- **Frequency-Selective Attention (FSAM)**: Enhances high-frequency details critical for medical imaging
-- **Bi-directional Frequency Interaction (BFIM)**: Enables information exchange between frequency bands
-- **Multi-Scale Residual (MSR)**: Preserves global information flow across the network
-- **Spatial-Aware Feature Merging (SAFM)**: Intelligent skip connection fusion
-
-## Architecture
-
-WaveGuideDiff consists of three incremental modules:
-
-- **Module A**: DWT/IDWT + FSAM (Frequency Domain Foundation)
-- **Module B**: BFIM (Bi-directional Frequency Interaction)
-- **Module C**: FSDC + MSR + SAFM (Information Preservation)
 
 ### Core Components
 
@@ -30,8 +14,7 @@ WaveGuideDiff consists of three incremental modules:
 3. **BFIM**: Bi-directional information exchange between frequency bands
 4. **FSDC**: Frequency-aware spatial dimension compression
 5. **MSR**: Multi-scale residual connections for global information flow
-6. **SAFM**: Spatial-aware feature merging for skip connections
-7. **IDWT Expanding**: Reconstructs output from frequency components
+6. **IDWT Expanding**: Reconstructs output from frequency components
 
 ## Installation
 
@@ -68,15 +51,12 @@ WaveGuideDiff/
 │   │   ├── image_train.py      # Main training script
 │   │   └── improved_diffusion/
 │   │       ├── waveguidediff.py    # WaveGuideDiff model (Full)
-│   │       ├── swin_unet.py        # SwinUNet baseline
 │   │       └── ...
 │   ├── train_waveguidediff.sh  # Training script for WaveGuideDiff
-│   └── train_swinunet.sh       # Training script for SwinUNet
 ├── inference/                   # Inference code
 │   ├── test.py                 # Main inference script
 │   ├── confs/
 │   │   ├── waveguidediff.yml   # WaveGuideDiff config
-│   │   └── swin_unet.yml       # SwinUNet config
 │   └── inference_waveguidediff.sh
 ├── evaluation/                  # Evaluation code
 │   ├── pyiqa_evaluation.py     # PyIQA-based evaluation
@@ -193,7 +173,3 @@ This project is licensed under the MIT License - see the [LICENSE](training/LICE
 This codebase is built upon:
 - [OpenAI's Improved Diffusion](https://github.com/openai/improved-diffusion)
 - [PyIQA](https://github.com/chaofengc/IQA-PyTorch) for image quality assessment
-
-## Contact
-
-For questions or issues, please open an issue on GitHub or contact [your-email@example.com].

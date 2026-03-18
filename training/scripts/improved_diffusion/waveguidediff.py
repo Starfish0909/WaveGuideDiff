@@ -1,26 +1,5 @@
 """
-WaveGuideDiff - Full Model (Module A + B + C)
-
-Incremental Ablation Study Design:
-- Module A: DWT/IDWT + FSAM (Frequency Domain Foundation)
-- Module B: BFIM (Bi-directional Frequency Interaction)
-- Module C: FSDC + MSR + SAFM (Information Preservation)
-
-Core Modules:
-- DWT/IDWT: Haar Wavelet Transform (Module A)
-- FSAM: Frequency Selective Attention (Module A)
-- BFIM: Bi-directional Frequency Interaction (Module B)
-- FSDC: Frequency-aware Spatial Dimension Compression (Module C)
-- MSR: Multi-Scale Residual (Module C)
-- SAFM: Spatial-Aware Feature Merging (Module C)
-
-Incremental Ablation Experiments:
-- waveguidediff_A.py:      Module A only
-- waveguidediff_AB_new.py: Module A + B
-- waveguidediff.py:        Module A + B + C <- Current Version (Full)
-
-Author: WaveGuideDiff Team
-Date: 2026-01
+WaveGuideDiff
 """
 
 from abc import abstractmethod
@@ -70,9 +49,6 @@ from .model import (
 )
 
 
-# ============================================================
-# Wavelet Transform Base Modules
-# ============================================================
 
 class DWTForward(nn.Module):
     """
@@ -140,9 +116,6 @@ class DWTInverse(nn.Module):
         return x
 
 
-# ============================================================
-# Core Innovation Modules
-# ============================================================
 
 class FSAM(nn.Module):
     """
@@ -190,7 +163,7 @@ class FSAM(nn.Module):
 
 class BFIM(nn.Module):
     """
-    Bi-directional Frequency Interaction Module (BFIM) - Module B
+    Bi-directional Frequency Interaction
 
     Implements bi-directional information exchange between LL (low-frequency) and HF (high-frequency):
     - LL provides structural context to HF
@@ -281,12 +254,9 @@ class BFIM(nn.Module):
 
 class FSDC(nn.Module):
     """
-    Frequency-aware Spatial Dimension Compression (FSDC) - Module C
-
-    Traditional method: Linear(4C -> 2C) compresses all components together
-    Our method: LL compressed separately + LH/HL/HH compressed in groups
-
-    Advantage: Maintains independence of each frequency component, reduces information mixing
+    Frequency-aware Spatial Dimension Compression (FSDC)
+    LL compressed separately + LH/HL/HH compressed in groups
+    Maintains independence of each frequency component, reduces information mixing
     """
     def __init__(self, in_channels, out_channels):
         """
@@ -376,7 +346,7 @@ class FSDCup(nn.Module):
 
 class MSR(nn.Module):
     """
-    Multi-Scale Residual Module (MSR) - Module C
+    Multi-Scale Residual Module (MSR)
 
     Provides a shortcut bypassing complex processing during downsampling
     Ensures original information is not completely lost during compression
@@ -471,20 +441,11 @@ class MSRup(nn.Module):
         return x
 
 
-# ============================================================
-# Main Downsampling/Upsampling Modules
-# ============================================================
+
 
 class DWTEncoding(nn.Module):
     """
-    Wavelet Transform Downsampling Module (Full Version - Module A + B + C)
-
-    Pipeline:
-    1. DWT decomposition -> LL, LH, HL, HH
-    2. FSAM high-frequency enhancement (Module A)
-    3. BFIM bi-directional frequency interaction (Module B)
-    4. FSDC grouped compression (Module C)
-    5. MSR global residual fusion (Module C)
+    Wavelet Transform Downsampling Module
 
     Input: (B, H*W, C)
     Output: (B, H/2*W/2, 2C)
@@ -576,13 +537,8 @@ class DWTEncoding(nn.Module):
 
 class IDWTExpanding(nn.Module):
     """
-    Inverse Wavelet Transform Upsampling Module (Full Version - Module A + B + C)
+    Inverse Wavelet Transform Upsampling Module
 
-    Pipeline:
-    1. FSDCup grouped expansion (Module C) -> LL, LH, HL, HH
-    2. BFIM bi-directional frequency interaction (Module B)
-    3. IDWT reconstruction (Module A)
-    4. MSRup multi-scale residual fusion (Module C)
 
     Input: (B, H*W, C)
     Output: (B, 4*H*W, C/2)
@@ -676,9 +632,7 @@ class IDWTExpanding(nn.Module):
         return f"input_resolution={self.input_resolution}, dim={self.dim}"
 
 
-# ============================================================
-# SAFM Cross-layer Information Fusion Module
-# ============================================================
+
 
 class SAFM(nn.Module):
     """
@@ -732,9 +686,7 @@ class SAFM(nn.Module):
         return out
 
 
-# ============================================================
-# Base Modules
-# ============================================================
+
 
 class TimestepBlock(nn.Module):
     """Base class for modules that support time embedding"""
@@ -957,22 +909,8 @@ class BasicLayer_up(TimestepBlock):
         return x
 
 
-# ============================================================
-# Main Model: WaveGuideDiff
-# ============================================================
 
 class WaveGuideDiff(nn.Module):
-    """
-    WaveGuideDiff - Full Model (Module A + B + C)
-
-    Core Components:
-    1. DWTEncoding - Wavelet transform downsampling (with all modules)
-    2. IDWTExpanding - Inverse wavelet transform upsampling (with all modules)
-    3. SAFM - Spatial-Aware Feature Merging (Module C)
-
-    Ablation Design:
-    - Includes: DWT/IDWT, FSAM (Module A), BFIM (Module B), FSDC, MSR, SAFM (Module C)
-    """
 
     def __init__(
             self,

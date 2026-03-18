@@ -3,14 +3,6 @@
 # Model description:
 #   Wavelet-guided diffusion model for IVOCT guidewire artifact removal
 #
-# Core modules:
-#   - DWT Encoding: DWT downsampling
-#   - IDWT Expanding: IDWT upsampling
-#   - FSAM: Frequency-selective attention
-#   - BFIM: Bi-directional frequency interaction
-#   - SAFM: Spatial-aware feature merging
-#   - MSR: Multi-scale residual
-
 attention_resolutions: 32,16,8
 class_cond: false
 diffusion_steps: 1000
@@ -53,7 +45,7 @@ image_size: 512
 seed: 36
 
 # Model path - update based on actual training results
-model_path: '/mnt/user/Checkpoints/WaveGuideDiff/log_cosine_batch4/ema_0.9999_100000.pt'
+model_path: ''
 name: WaveGuideDiff
 model_type: waveguidediff  # WaveGuideDiff model
 
@@ -90,8 +82,8 @@ data:
   eval:
     paper_face_mask:
       mask_loader: true
-      gt_path: "/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_images"
-      mask_path: "/mnt/user/Data/Guide_Inpainting_Polar/Nowith_guide/test_masks"
+      gt_path: ""
+      mask_path: ""
       image_size: 512
       class_cond: false
       deterministic: true
@@ -105,7 +97,7 @@ data:
       max_len: null
       num_workers: 0
       paths:
-        srs: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/srs'
-        lrs: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/lrs'
-        gts: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/gts'
-        gt_keep_masks: '/mnt/user/Checkpoints/WaveGuideDiff/cosine_ddpm_250_1_1_5_100000_36_batch1/gt_keep_masks'
+        srs: ''
+        lrs: ''
+        gts: ''
+        gt_keep_masks: ''

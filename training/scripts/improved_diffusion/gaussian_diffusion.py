@@ -134,7 +134,7 @@ class GaussianDiffusion:
         perceptual_loss_weight=0.1,
         perceptual_loss_threshold=0.1,  # Only compute perceptual loss in low noise phase (t < threshold * num_timesteps)
         perceptual_loss_type='vgg19',  # 'vgg19' or 'resnet50'
-        resnet_weights_path='/mnt/user/WaveGuideDiff_swinunet',  # ResNet50 weights path
+        resnet_weights_path='/mnt/user/WaveGuideDiff',  # ResNet50 weights path
         use_snr_weight=False,
         snr_gamma=5.0,  # SNR weighting parameter, reference paper: https://arxiv.org/abs/2303.09556
     ):

@@ -5,8 +5,8 @@
 # ========================================
 
 # Set paths
-GT_DIR="/mnt/user/Checkpoints/ArtiFusion_Wavelet_V2/cosine_ddpm_250_1_1_5_100000_128_batch1/gts"
-PRED_DIR="/mnt/user/Checkpoints/ArtiFusion_Wavelet_V2/cosine_ddpm_250_1_1_5_100000_128_batch1/srs"
+GT_DIR=""
+PRED_DIR=""
 
 # Local weights path
 WEIGHTS_DIR="$(dirname "$0")/checkpoints"
