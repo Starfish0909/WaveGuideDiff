@@ -1,9 +1,12 @@
 #!/bin/bash
 
+# ============================================================================
 # WaveGuideDiff (Wavelet-Guidewire Diffusion Model) Inference Script
+# ============================================================================
 
+echo "==========================================="
 echo "WaveGuideDiff
-
+echo "==========================================="
 
 CONF_FILE="confs/waveguidediff.yml"
 if [ ! -f "$CONF_FILE" ]; then

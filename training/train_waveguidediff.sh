@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# ============================================================================
 # WaveGuideDiff (Wavelet-Guidewire Diffusion Model) Training Script
 #
 # Model description:
@@ -7,15 +8,15 @@
 #
 # Usage:
 #   ./train_waveguidediff.sh
-
+# ============================================================================
 
 export OPENAI_LOGDIR="/mnt/user/Checkpoints/WaveGuideDiff/log"
 export DATA_DIR=''
 export OPENAI_LOG_FORMAT="stdout,log,csv,tensorboard"
 
-
+# ============================================================================
 # Training config: auto-compute steps based on epochs
-
+# ============================================================================
 NUM_IMAGES=        # Number of images in dataset
 TARGET_EPOCHS=      # Target training epochs (adjust as needed)
 BATCH_SIZE=           # Batch size (effective batch size)
