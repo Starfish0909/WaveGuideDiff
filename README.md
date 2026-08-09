@@ -30,8 +30,6 @@ git clone https://github.com/Starfish0909/WaveGuideDiff.git
 cd WaveGuideDiff
 ```
 
-Install the PyTorch build that matches your CUDA environment, then install the remaining dependencies:
-
 ```bash
 python -m pip install --upgrade pip
 python -m pip install -e ./training
