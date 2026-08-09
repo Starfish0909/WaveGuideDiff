@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# ============================================================================
 # WaveGuideDiff (Wavelet-Guidewire Diffusion Model) Training Script
 #
 # Model description:
@@ -8,7 +7,7 @@
 #
 # Usage:
 #   ./train_waveguidediff.sh
-# ============================================================================
+
 
 export OPENAI_LOGDIR="/mnt/user/Checkpoints/WaveGuideDiff/log"
 export DATA_DIR=''

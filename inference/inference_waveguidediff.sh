@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# ============================================================================
-# WaveGuideDiff (Wavelet-Guidewire Diffusion Model) Inference Script
-# ============================================================================
 
-echo "==========================================="
 echo "WaveGuideDiff
-echo "==========================================="
 
 CONF_FILE="confs/waveguidediff.yml"
 if [ ! -f "$CONF_FILE" ]; then
@@ -42,4 +37,3 @@ END_TIME=$(date +%s)
 ELAPSED=$((END_TIME - START_TIME))
 MINUTES=$((ELAPSED / 60))
 SECONDS=$((ELAPSED % 60))
-
