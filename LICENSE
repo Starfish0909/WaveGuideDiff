@@ -1,0 +1,26 @@
+WaveGuideDiff Licensing Notice
+
+Copyright (c) 2026 Starfish0909
+
+Except where otherwise noted, the original contributions in this repository
+are licensed under the Creative Commons Attribution-NonCommercial-ShareAlike
+4.0 International License (CC BY-NC-SA 4.0).
+
+You may view the full license terms at:
+https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+
+In summary, the licensed material may be shared and adapted for
+non-commercial purposes, provided that appropriate attribution is given and
+adapted material is distributed under the same license. The full legal code
+at the URL above controls if this summary differs from it.
+
+Third-party components retain their original copyright and license notices:
+
+- OpenAI-derived training components remain available under the MIT License;
+  see training/LICENSE.
+- Files carrying Huawei Technologies Co., Ltd. CC BY-NC-SA 4.0 headers remain
+  governed by those notices and license terms.
+- Other third-party files, if any, remain governed by the notices contained in
+  those files.
+
+No patent or trademark rights are granted by CC BY-NC-SA 4.0.
