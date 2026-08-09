@@ -1,6 +1,6 @@
 # WaveGuideDiff
 
-PyTorch implementation of **WaveGuideDiff: A Wavelet-Guided Diffusion Model for Guidewire Artifact Removal in IVOCT Images**.
+## **WaveGuideDiff: A Wavelet-Guided Diffusion Model for Guidewire Artifact Removal in IVOCT Images**
 
 WaveGuideDiff restores guidewire-occluded regions in intravascular optical coherence tomography (IVOCT) images while preserving surrounding vessel and tissue structures. This repository provides the model, training code, and inference pipeline.
 
